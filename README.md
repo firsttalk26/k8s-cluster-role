@@ -23,12 +23,33 @@ Example Playbook
 ----------------
 ```
 {
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+     - hosts: all
+         tasks: 
+           - include_role: 
+                name: k8s-cluster-role
+             vars: 
+               kubernetes_role: "MasterNode"
+               
 }
 ```
+This playbook will run and configure master node
+
+
+```
+{
+     - hosts: all
+          tasks: 
+            - include_role: 
+                 name: k8s-cluster-role
+              vars: 
+                 kubernetes_role: "SlaveNode"
+       
+
+}
+```
+
+This playbook will run and configure slave node 
+
 License
 -------
 
