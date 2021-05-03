@@ -5,14 +5,17 @@ This role is created for creating kubernetes cluster.
 
 More variables 
 ----------------
-                                                               kubernetes_npode
-During the including role in playbook needed to pass variable ----------------- for setup master node and slave node
+                                                               
+During the including role in playbook needed to pass variable  `kubernetes_node`   for setup master node and slave node
 
 variable for Master Node
-----------------
+------------------------
+
+
 `kubernetes_role: "MasterNode" `
+
 variable for slave node
---------------
+-----------------------
 
 `kubernetes_role: "SlaveNode" `
 
