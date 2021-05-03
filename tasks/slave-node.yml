@@ -1,0 +1,6 @@
+
+- command: "ls /etc/kubernetes/kubelet.conf /etc/kubernetes/pki/ca.crt"
+  register: NodeCheckVar
+  ignore_errors: yes
+- shell: "{{ node_join_cmd }}"
+  when: NodeCheckVar.rc != 0

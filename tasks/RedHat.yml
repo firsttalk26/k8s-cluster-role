@@ -1,0 +1,70 @@
+- name: Installing docker
+  package: 
+      name: "docker"
+      state: present
+
+
+- name: Starting and enabling docker service
+  service: 
+      name: "docker"
+      state: "started"
+      enabled: yes
+
+
+- name: configuring yum repository 
+  copy: 
+      src: "kubernetes.repo"
+      dest: "/etc/yum.repos.d/kubernetes.repo"
+  register: CopyVar
+
+
+- name: checking the existence of  kubelet kubeadm kubectl
+  command: "rpm -q kubelet kubeadm kubectl"
+  register: KubeVar
+  ignore_errors: yes
+
+
+
+- command: "yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes"
+  when: KubeVar.rc != 0 
+
+
+- service: 
+      name: "kubelet"
+      state: "started"
+      enabled: yes
+
+
+- name: configuring kubernetes
+  command: "kubeadm config images pull"
+
+- copy: 
+      src: "docker-cgroup.json"
+      dest: "/etc/docker/daemon.json"
+  register: CgroupVar
+
+
+- command: "systemctl daemon-reload"
+  when: CgroupVar.changed == true
+
+
+- service: 
+      name: "docker"
+      state: restarted
+  when: CgroupVar.changed == true
+
+
+- name: Installing iproute-tc
+  package: 
+      name: "iproute-tc"
+      state: present
+
+
+- copy: 
+      src: "set_net_bridge_bridge-nf-call-iptables_1"
+      dest: "/etc/sysctl.d/k8s.conf"
+  register: iptableVar
+
+
+- command: "sysctl --system"
+  when: iptableVar.changed == true

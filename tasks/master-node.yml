@@ -1,0 +1,46 @@
+- name: checking master node is running or not
+  command: "ls /etc/kubernetes/manifests/etcd.yaml /etc/kubernetes/manifests/kube-apiserver.yaml /etc/kubernetes/manifests/kube-controller-manager.yaml  /etc/kubernetes/manifests/kube-scheduler.yaml"
+  register: KubeInitVar
+  ignore_errors: yes
+
+
+- name: Starting master node
+  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem"
+  when: KubeInitVar.rc != 0 
+
+
+- name: "create $HOME/.kube folder"
+  file: 
+    path: $HOME/.kube
+    state: directory
+    mode: 0755
+
+
+- name: "checking the existence of /root/.kube/config"
+  command: "ls $HOME/.kube/config"
+  register: ConfigVar
+  ignore_errors: yes
+
+
+- name: "coping  /etc/kubernetes/admin.conf.....  "
+  command: "sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config"
+  when: ConfigVar.rc != 0
+
+
+- command: "id -u"
+  register: user
+- command: "id -g"
+  register: group
+
+- name: "changing owner or group of file"
+  file: 
+    path: $HOME/.kube/config
+    owner: "{{ user.stdout }}"
+    group: "{{ group.stdout }}"
+    mode: 0644
+  
+
+
+- name: "Applying flanel plugin "
+  command: "kubectl apply  -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+
