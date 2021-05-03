@@ -12,12 +12,12 @@ variable for Master Node
 ------------------------
 
 
-`kubernetes_role: "MasterNode" `
+`kubernetes_node: "MasterNode" `
 
 variable for slave node
 -----------------------
 
-`kubernetes_role: "SlaveNode" `
+`kubernetes_node: "SlaveNode" `
 
 Example Playbook
 ----------------
@@ -28,7 +28,7 @@ Example Playbook
            - include_role: 
                 name: k8s-cluster-role
              vars: 
-               kubernetes_role: "MasterNode"
+               kubernetes_node: "MasterNode"
                
 }
 ```
@@ -42,7 +42,7 @@ This playbook will run and configure master node
             - include_role: 
                  name: k8s-cluster-role
               vars: 
-                 kubernetes_role: "SlaveNode"
+                 kubernetes_node: "SlaveNode"
        
 
 }
